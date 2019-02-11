@@ -273,12 +273,12 @@ def main():
 
 
 
+    format_string = "{:<5} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>15.3f}\t\\\\\t\\hline"
+    format_string2 = "{:<5} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8}\t\\\\\t\\hline\hline"
 
-    format_string = "{:<5} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>15.3f}\t\\\\\t\\hline"
-    format_string2 = "{:<5} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8}\t\\\\\t\\hline\hline"
-
-    print( r"& \multicolumn{3}{c||}{\bf{Entropy}} &\multicolumn{3}{c||}{\bf{Majority Error}} &\multicolumn{3}{c}{\bf{Gini Index}} \\ \hline")
-    print(format_string2.format("Depth","Train", "Test", "Fit","Train", "Test", "Fit","Train", "Test", "Fit"))
+    print(r"\multicolumn{7}{c}{\bf{Car Dataset Prediction Errors}} \\ \hline")
+    print( r"& \multicolumn{2}{c||}{\bf{Entropy}} &\multicolumn{2}{c||}{\bf{Majority Error}} &\multicolumn{2}{c}{\bf{Gini Index}} \\ \hline")
+    print(format_string2.format("Depth","Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1,7):
 
         EN_tree = DecisionTree(depth, 0, car_train_examples, entropy, None, categoricals)
@@ -301,13 +301,12 @@ def main():
 
     print()
     print()
-
-
+    print(r"\multicolumn{7}{c}{\bf{Bank Dataset Prediction Errors, Not Replacing Unknowns}} \\ \hline")
     bank_train_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_train_file, True)
     bank_test_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_test_file, True)
 
-    print(r"& \multicolumn{3}{c||}{\bf{Entropy}} &\multicolumn{3}{c||}{\bf{Majority Error}} &\multicolumn{3}{c}{\bf{Gini Index}} \\ \hline")
-    print(format_string2.format("Depth", "Train", "Test", "Fit", "Train", "Test", "Fit", "Train", "Test", "Fit"))
+    print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
+    print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1, 17):
         ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, entropy, None, categoricals)
         GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, majority_error, None, categoricals)
@@ -329,25 +328,34 @@ def main():
 
 
 
+
+
     bank_train_examples_unknown_not_label, foo, categoricals = examples_from_attributes(bank_train_file, False)
-    bank_test_examples_unknown_not_label, foo, categoricals = examples_from_attributes(bank_test_file, False)
 
+    print()
+    print()
+    print(r"\multicolumn{7}{c}{\bf{Bank Dataset Prediction Errors, Replacing Unknowns}} \\ \hline")
+    print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
+    print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
+    for depth in range(1, 17):
+        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, entropy, None, categoricals)
+        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, majority_error, None, categoricals)
+        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, gini_index, None, categoricals)
 
-    # bank_trees_unknown_is_label = list()
-    # bank_trees_unknown_not_label = list()
-    # bank_test_examples, foo, categoricals = examples_from_attributes(bank_test_file, True)
-    # for depth in range(0,16):
-    #     bank_trees_unknown_is_label.append(DecisionTree(depth+1, 0, bank_train_examples_unknown_is_label, entropy, None, categoricals))
-    #     bank_trees_unknown_not_label.append(DecisionTree(depth+1, 0, bank_train_examples_unknown_not_label, entropy, None, categoricals))
-    #     print("&", depth+1, "\t&", average_error(bank_trees_unknown_is_label[depth],
-    #                                             bank_train_examples_unknown_is_label),
-    #           "\t&", average_error(bank_trees_unknown_not_label[depth],
-    #                                bank_train_examples_unknown_not_label),
-    #           "\t&", average_error(bank_trees_unknown_is_label[depth],
-    #                                bank_test_examples),
-    #           "\t&", average_error(bank_trees_unknown_not_label[depth],
-    #                                bank_test_examples),
-    #           "\t\\\\\t\hline")
+        EN_train_err = average_error(EN_tree, bank_train_examples_unknown_not_label)
+        EN_test_err = average_error(EN_tree, bank_test_examples_unknown_is_label)
+        EN_diff = EN_train_err / EN_test_err
+        ME_train_err = average_error(ME_tree, bank_train_examples_unknown_not_label)
+        ME_test_err = average_error(ME_tree, bank_test_examples_unknown_is_label)
+        ME_diff = ME_train_err / ME_test_err
+        GI_train_err = average_error(GI_tree, bank_train_examples_unknown_not_label)
+        GI_test_err = average_error(GI_tree, bank_test_examples_unknown_is_label)
+        GI_diff = GI_train_err / GI_test_err
+
+        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff,
+                                         GI_train_err, GI_test_err, GI_diff)
+        print(formatted)
+
 
 
 
