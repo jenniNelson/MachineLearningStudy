@@ -251,7 +251,7 @@ def main():
 
 
 
-    format_string = "{:<5} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>15.3f}\t\\\\\t\\hline"
+    format_string = "{:<5} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f}\t\\\\\t\\hline"
     format_string2 = "{:<5} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8}\t\\\\\t\\hline\hline"
 
     print(r"\newcolumntype{R}{>{\centering\arraybackslash}X}")
