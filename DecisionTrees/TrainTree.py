@@ -276,6 +276,8 @@ def main():
     format_string = "{:<5} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>8.3f} & {:>15.3f}\t\\\\\t\\hline"
     format_string2 = "{:<5} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8} & {:>8}\t\\\\\t\\hline\hline"
 
+    print(r"\newcolumntype{R}{>{\centering\arraybackslash}X}")
+    print(r"\begin{tabularx}{0.75\textwidth}{c||cc|cc|cc}")
     print(r"\multicolumn{7}{c}{\bf{Car Dataset Prediction Errors}} \\ \hline")
     print( r"& \multicolumn{2}{c||}{\bf{Entropy}} &\multicolumn{2}{c||}{\bf{Majority Error}} &\multicolumn{2}{c}{\bf{Gini Index}} \\ \hline")
     print(format_string2.format("Depth","Train", "Test", "Train", "Test", "Train", "Test"))
@@ -297,14 +299,17 @@ def main():
 
         formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff, GI_train_err, GI_test_err, GI_diff)
         print(formatted)
-
+    print(r"\end{tabularx}")
 
     print()
     print()
-    print(r"\multicolumn{7}{c}{\bf{Bank Dataset Prediction Errors, Not Replacing Unknowns}} \\ \hline")
-    bank_train_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_train_file, True)
+
     bank_test_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_test_file, True)
+    bank_train_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_train_file, True)
 
+    print(r"\newcolumntype{R}{>{\centering\arraybackslash}X}")
+    print(r"\begin{tabularx}{0.75\textwidth}{c||cc|cc|cc}")
+    print(r"\multicolumn{7}{c}{\bf{Bank Dataset Prediction Errors, Not Replacing Unknowns}} \\ \hline")
     print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
     print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1, 17):
@@ -325,6 +330,7 @@ def main():
         formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff,
                                          GI_train_err, GI_test_err, GI_diff)
         print(formatted)
+    print(r"\end{tabularx}")
 
 
 
@@ -334,6 +340,9 @@ def main():
 
     print()
     print()
+
+    print(r"\newcolumntype{R}{>{\centering\arraybackslash}X}")
+    print(r"\begin{tabularx}{0.75\textwidth}{c||cc|cc|cc}")
     print(r"\multicolumn{7}{c}{\bf{Bank Dataset Prediction Errors, Replacing Unknowns}} \\ \hline")
     print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
     print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
@@ -355,9 +364,7 @@ def main():
         formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff,
                                          GI_train_err, GI_test_err, GI_diff)
         print(formatted)
-
-
-
+    print(r"\end{tabularx}")
 
 
 main()
