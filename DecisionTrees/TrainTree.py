@@ -243,28 +243,6 @@ def main():
     bank_test_file = "Data/bank/test.csv"
 
 
-    # car_examples, car_train_attribute_values, car_is_categorical_attribute = examples_from_attributes(car_train_file, False)
-    # car_tree = DecisionTree(6, 0, car_examples, info_gain, None, car_train_attribute_values, car_is_categorical_attribute)
-    #
-    # car_test_examples, car_test_attribute_values, tmp = examples_from_attributes(car_test_file, False)
-    #
-    # print("Car training error:" + str(average_error(car_tree, car_examples)))
-    # print("Car testing error:" + str(average_error(car_tree, car_test_examples)))
-    #
-    #
-    #
-    # bank_examples, bank_train_attribute_values, bank_is_categorical_attribute = examples_from_attributes(bank_train_file, False)
-    # bank_tree = DecisionTree(10, 0, bank_examples, info_gain,  None, bank_train_attribute_values, bank_is_categorical_attribute)
-    #
-    #
-    # bank_test_examples, bank_test_attribute_values, tmp = examples_from_attributes(bank_test_file, False)
-    #
-    #
-    # print("Bank training error:" + str(average_error(bank_tree, bank_examples)))
-    # print("Bank testing error:" + str(average_error(bank_tree, bank_test_examples)))
-
-    # print("Car Dataset")
-    # print("&Depth\t&Unknown is a label training error\t&Replace unknown with most common value training error\t&Unknown is a label testing error\t&Replace nknown with most common value testing error\t")
 
     car_train_examples, foo, categoricals = examples_from_attributes(car_train_file, True)
     car_train_examples_unknown_not_label, foo, categoricals = examples_from_attributes(car_train_file, False)
@@ -289,15 +267,12 @@ def main():
 
         EN_train_err = average_error(EN_tree, car_train_examples)
         EN_test_err = average_error(EN_tree, car_test_examples)
-        EN_diff = EN_train_err / EN_test_err
         ME_train_err = average_error(ME_tree, car_train_examples)
         ME_test_err = average_error(ME_tree, car_test_examples)
-        ME_diff = ME_train_err / ME_test_err
         GI_train_err = average_error(GI_tree, car_train_examples)
         GI_test_err = average_error(GI_tree, car_test_examples)
-        GI_diff = GI_train_err / GI_test_err
 
-        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff, GI_train_err, GI_test_err, GI_diff)
+        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_train_err, ME_test_err, GI_train_err, GI_test_err)
         print(formatted)
     print(r"\end{tabularx}")
 
@@ -313,22 +288,19 @@ def main():
     print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
     print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1, 17):
-        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, entropy, None, categoricals)
-        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, majority_error, None, categoricals)
-        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, gini_index, None, categoricals)
+        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, entropy, None, categoricals)
+        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, majority_error, None, categoricals)
+        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, gini_index, None, categoricals)
 
         EN_train_err = average_error(EN_tree, bank_train_examples_unknown_is_label)
         EN_test_err = average_error(EN_tree, bank_test_examples_unknown_is_label)
-        EN_diff = EN_train_err / EN_test_err
         ME_train_err = average_error(ME_tree, bank_train_examples_unknown_is_label)
         ME_test_err = average_error(ME_tree, bank_test_examples_unknown_is_label)
-        ME_diff = ME_train_err / ME_test_err
         GI_train_err = average_error(GI_tree, bank_train_examples_unknown_is_label)
         GI_test_err = average_error(GI_tree, bank_test_examples_unknown_is_label)
-        GI_diff = GI_train_err / GI_test_err
 
-        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff,
-                                         GI_train_err, GI_test_err, GI_diff)
+        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_train_err, ME_test_err,
+                                         GI_train_err, GI_test_err)
         print(formatted)
     print(r"\end{tabularx}")
 
@@ -353,16 +325,13 @@ def main():
 
         EN_train_err = average_error(EN_tree, bank_train_examples_unknown_not_label)
         EN_test_err = average_error(EN_tree, bank_test_examples_unknown_is_label)
-        EN_diff = EN_train_err / EN_test_err
         ME_train_err = average_error(ME_tree, bank_train_examples_unknown_not_label)
         ME_test_err = average_error(ME_tree, bank_test_examples_unknown_is_label)
-        ME_diff = ME_train_err / ME_test_err
         GI_train_err = average_error(GI_tree, bank_train_examples_unknown_not_label)
         GI_test_err = average_error(GI_tree, bank_test_examples_unknown_is_label)
-        GI_diff = GI_train_err / GI_test_err
 
-        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_diff, ME_train_err, ME_test_err, ME_diff,
-                                         GI_train_err, GI_test_err, GI_diff)
+        formatted = format_string.format(depth, EN_train_err, EN_test_err, ME_train_err, ME_test_err,
+                                         GI_train_err, GI_test_err)
         print(formatted)
     print(r"\end{tabularx}")
 
