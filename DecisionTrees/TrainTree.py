@@ -21,7 +21,8 @@ class DecisionTree:
             self.decide = lambda sample : most_common_label
             return
 
-        most_common_label = DecisionTree.most_common_label(examples)
+        # most_common_label = DecisionTree.most_common_label(examples)
+        _, most_common_label,_ = weighted_counts_and_most_common(examples)
         if depth == max_depth:
             self.decide = lambda sample : most_common_label
             return
@@ -297,10 +298,10 @@ if __name__ == '__main__':
 
 
 
-    car_train_examples, foo, categoricals = examples_from_attributes(car_train_file, True)
-    car_train_examples_unknown_not_label, foo, categoricals = examples_from_attributes(car_train_file, False)
+    car_train_examples, _, categoricals = examples_from_attributes(car_train_file, True)
+    car_train_examples_unknown_not_label, _, categoricals = examples_from_attributes(car_train_file, False)
 
-    car_test_examples, foo, categoricals = examples_from_attributes(car_test_file, True)
+    car_test_examples, _, categoricals = examples_from_attributes(car_test_file, True)
 
 
 
@@ -332,8 +333,8 @@ if __name__ == '__main__':
     print()
     print()
 
-    bank_test_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_test_file, True)
-    bank_train_examples_unknown_is_label, foo, categoricals = examples_from_attributes(bank_train_file, True)
+    bank_test_examples_unknown_is_label, _, categoricals = examples_from_attributes(bank_test_file, True)
+    bank_train_examples_unknown_is_label, _, categoricals = examples_from_attributes(bank_train_file, True)
 
     print(r"\newcolumntype{R}{>{\centering\arraybackslash}X}")
     print(r"\begin{tabularx}{0.75\textwidth}{c||cc|cc|cc}")
@@ -361,7 +362,7 @@ if __name__ == '__main__':
 
 
 
-    bank_train_examples_unknown_not_label, foo, categoricals = examples_from_attributes(bank_train_file, False)
+    bank_train_examples_unknown_not_label, _, categoricals = examples_from_attributes(bank_train_file, False)
 
     print()
     print()
