@@ -5,9 +5,10 @@ from statistics import median
 from math import log
 
 class Example:
-    def __init__(self, values):
+    def __init__(self, values, weight=1):
         self.attributes = values[0: len(values)-1]
         self.label = values[len(values)-1]
+        self.weight = weight
 
 
 class DecisionTree:
@@ -132,19 +133,40 @@ def entropy(examples):
 
     return entropy_val
 
+def entropy_weighted(examples):
+    if len(examples) == 0:
+        return 0
+    counts, most_common, total_count = weighted_counts_and_most_common(examples)
+
+    entropy_val = 0
+    for label, count in counts.items():
+        if count == 0:
+            continue
+        proportion = count / total_count
+        entropy_val += -proportion * log(proportion)
+
+    return entropy_val
+
 def majority_error(examples):
     if len(examples) == 0:
         return 0
-    labels = list(map(lambda samp: samp.label, examples))
+    labels = (map(lambda samp: samp.label, examples))
 
     num_most_common = Counter(labels).most_common(1)[0][1]
 
     return 1 - num_most_common/len(examples)
 
+def majority_weighted(examples):
+    if len(examples) == 0:
+        return 0
+    counts, most_common, total_count = weighted_counts_and_most_common(examples)
+
+    return 1 - counts[most_common]/total_count
+
 def gini_index(examples):
     if len(examples) == 0:
         return 0
-    labels = list(map(lambda samp: samp.label, examples))
+    labels = (map(lambda samp: samp.label, examples))
 
     gini = 1
     num_examples = len(examples)
@@ -152,6 +174,37 @@ def gini_index(examples):
         gini -= (count/num_examples)*(count/num_examples)
 
     return gini
+
+def gini_weighted(examples):
+    if len(examples) == 0:
+        return 0
+    counts, most_common, total_count = weighted_counts_and_most_common(examples)
+
+    gini = 1
+    for label, count in counts.items():
+        portion = count / total_count
+        gini -= portion*portion
+    return gini
+
+
+def weighted_counts_and_most_common(examples):
+    if len(examples) == 0:
+        return 0
+    counts = dict()
+    total_count = 0
+    most_common_number = 0
+    most_common_label = None
+    for sample in examples:
+        total_count += sample.weight
+        if sample.label in counts:
+            counts[sample.label] += sample.weight
+        else:
+            counts[sample.label] = sample.weight
+        if counts[sample.label] > most_common_number:
+            most_common_label = sample.label
+            most_common_number = counts[sample.label]
+    return counts, most_common_label, total_count
+
 
 
 def partition_examples_categorically(examples, partitioning_attribute):
@@ -236,7 +289,7 @@ def average_error(tree, test_examples):
     return incorrect / (incorrect + correct)
 
 
-def main():
+if __name__ == '__main__':
     car_train_file = "Data/car/train.csv"
     car_test_file = "Data/car/test.csv"
     bank_train_file = "Data/bank/train.csv"
@@ -261,9 +314,9 @@ def main():
     print(format_string2.format("Depth","Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1,7):
 
-        EN_tree = DecisionTree(depth, 0, car_train_examples, entropy, None, categoricals)
-        ME_tree = DecisionTree(depth, 0, car_train_examples, majority_error, None, categoricals)
-        GI_tree = DecisionTree(depth, 0, car_train_examples, gini_index, None, categoricals)
+        EN_tree = DecisionTree(depth, 0, car_train_examples, entropy_weighted, None, categoricals)
+        ME_tree = DecisionTree(depth, 0, car_train_examples, majority_weighted, None, categoricals)
+        GI_tree = DecisionTree(depth, 0, car_train_examples, gini_weighted, None, categoricals)
 
         EN_train_err = average_error(EN_tree, car_train_examples)
         EN_test_err = average_error(EN_tree, car_test_examples)
@@ -288,9 +341,9 @@ def main():
     print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
     print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1, 17):
-        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, entropy, None, categoricals)
-        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, majority_error, None, categoricals)
-        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, gini_index, None, categoricals)
+        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, entropy_weighted, None, categoricals)
+        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, majority_weighted, None, categoricals)
+        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_is_label, gini_weighted, None, categoricals)
 
         EN_train_err = average_error(EN_tree, bank_train_examples_unknown_is_label)
         EN_test_err = average_error(EN_tree, bank_test_examples_unknown_is_label)
@@ -319,9 +372,9 @@ def main():
     print(r"& \multicolumn{2}{R||}{\bf{Entropy}} &\multicolumn{2}{R||}{\bf{Majority Error}} &\multicolumn{2}{R}{\bf{Gini Index}} \\ \hline")
     print(format_string2.format("Depth", "Train", "Test", "Train", "Test", "Train", "Test"))
     for depth in range(1, 17):
-        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, entropy, None, categoricals)
-        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, majority_error, None, categoricals)
-        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, gini_index, None, categoricals)
+        ME_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, entropy_weighted, None, categoricals)
+        GI_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, majority_weighted, None, categoricals)
+        EN_tree = DecisionTree(depth, 0, bank_train_examples_unknown_not_label, gini_weighted, None, categoricals)
 
         EN_train_err = average_error(EN_tree, bank_train_examples_unknown_not_label)
         EN_test_err = average_error(EN_tree, bank_test_examples_unknown_is_label)
@@ -336,4 +389,4 @@ def main():
     print(r"\end{tabularx}")
 
 
-main()
+# main()
