@@ -10,6 +10,11 @@ class Example:
         self.label = values[len(values)-1]
         self.weight = weight
 
+    def __str__(self):
+        return "%ds: %s : %ds" % (self.label, str(self.weight), self.attributes)
+    def __repr__(self):
+        return self.__str__()
+
 
 class DecisionTree:
 
@@ -22,14 +27,14 @@ class DecisionTree:
             return
 
         # most_common_label = DecisionTree.most_common_label(examples)
-        _, most_common_label,_ = weighted_counts_and_most_common(examples)
+        _, self.most_common_label, _ = weighted_counts_and_most_common(examples)
         if depth == max_depth:
-            self.decide = lambda sample : most_common_label
+            self.decide = lambda sample : self.most_common_label
             return
 
 
         best_attribute = DecisionTree.find_best_attribute(gain_metric, examples, is_categoric_attribute)
-
+        self.splitting_attribute = best_attribute
         if is_categoric_attribute[best_attribute]:
             # partition examples
             categorical_partitions = partition_examples_categorically(examples, best_attribute)
@@ -42,7 +47,7 @@ class DecisionTree:
                 if sample.attributes[best_attribute] in self.categorical_children.keys():
                     return self.categorical_children[sample.attributes[best_attribute]].decide(sample)
                 else:
-                    return most_common_label
+                    return self.most_common_label
 
             self.decide = categorical_decision
         else:
@@ -50,9 +55,9 @@ class DecisionTree:
             # partition examples numerically:
             less_than_examples, greater_than_examples, threshold = partition_examples_numerically(examples, best_attribute)
 
-            self.less_child = DecisionTree(max_depth, depth + 1, less_than_examples, gain_metric, most_common_label, is_categoric_attribute)
+            self.less_child = DecisionTree(max_depth, depth + 1, less_than_examples, gain_metric, self.most_common_label, is_categoric_attribute)
             self.greater_child = DecisionTree(max_depth, depth + 1, greater_than_examples, gain_metric,
-                                              most_common_label, is_categoric_attribute)
+                                              self.most_common_label, is_categoric_attribute)
 
             def numeric_decision(sample):
                 if isinstance(sample.attributes[best_attribute], float):
@@ -61,7 +66,7 @@ class DecisionTree:
                     else:
                         return self.less_child.decide(sample)
                 else:
-                    return most_common_label
+                    return self.most_common_label
 
             self.decide = numeric_decision
 
@@ -228,7 +233,7 @@ def partition_examples_numerically(examples, partitioning_attribute):
     return less_than_examples, greater_than_examples, split
 
 
-def examples_from_attributes(file, unknown_is_label):
+def examples_from_file(file, unknown_is_label):
     examples = list()
     num_attributes = None
     attribute_values = list()
@@ -298,10 +303,10 @@ if __name__ == '__main__':
 
 
 
-    car_train_examples, _, categoricals = examples_from_attributes(car_train_file, True)
-    car_train_examples_unknown_not_label, _, categoricals = examples_from_attributes(car_train_file, False)
+    car_train_examples, _, categoricals = examples_from_file(car_train_file, True)
+    car_train_examples_unknown_not_label, _, categoricals = examples_from_file(car_train_file, False)
 
-    car_test_examples, _, categoricals = examples_from_attributes(car_test_file, True)
+    car_test_examples, _, categoricals = examples_from_file(car_test_file, True)
 
 
 
@@ -333,8 +338,8 @@ if __name__ == '__main__':
     print()
     print()
 
-    bank_test_examples_unknown_is_label, _, categoricals = examples_from_attributes(bank_test_file, True)
-    bank_train_examples_unknown_is_label, _, categoricals = examples_from_attributes(bank_train_file, True)
+    bank_test_examples_unknown_is_label, _, categoricals = examples_from_file(bank_test_file, True)
+    bank_train_examples_unknown_is_label, _, categoricals = examples_from_file(bank_train_file, True)
 
     print(r"\newcolumntype{R}{>{\centering\arraybackslash}X}")
     print(r"\begin{tabularx}{0.75\textwidth}{c||cc|cc|cc}")
@@ -362,7 +367,7 @@ if __name__ == '__main__':
 
 
 
-    bank_train_examples_unknown_not_label, _, categoricals = examples_from_attributes(bank_train_file, False)
+    bank_train_examples_unknown_not_label, _, categoricals = examples_from_file(bank_train_file, False)
 
     print()
     print()
