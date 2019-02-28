@@ -1,8 +1,16 @@
+from sys import path
+from os.path import dirname, realpath
+MY_DIR = dirname(realpath(__file__))
+path.append(MY_DIR)
+PARENT_DIR = dirname(path[0])
+path.append(PARENT_DIR)
 
 
 from collections import Counter
 from statistics import median
 from math import log
+from random import sample
+
 
 class Example:
     def __init__(self, values, weight=1):
@@ -18,7 +26,7 @@ class Example:
 
 class DecisionTree:
 
-    def __init__(self, max_depth, depth, examples, gain_metric, most_common_label, is_categoric_attribute):
+    def __init__(self, max_depth, depth, examples, gain_metric, most_common_label, is_categoric_attribute, random_subset=False, random_subset_size=0):
         self.depth = depth
         self.max_depth = max_depth
 
@@ -33,7 +41,8 @@ class DecisionTree:
             return
 
 
-        best_attribute = DecisionTree.find_best_attribute(gain_metric, examples, is_categoric_attribute)
+        best_attribute = DecisionTree.find_best_attribute(gain_metric, examples, is_categoric_attribute) \
+            if not random_subset else DecisionTree.find_best_attribute_random_subset(gain_metric, examples, is_categoric_attribute, random_subset_size)
         self.splitting_attribute = best_attribute
         if is_categoric_attribute[best_attribute]:
             # partition examples
@@ -41,7 +50,7 @@ class DecisionTree:
 
             self.categorical_children = dict()
             for value in categorical_partitions.keys():
-                self.categorical_children[value] = DecisionTree(max_depth, depth + 1, categorical_partitions[value], gain_metric, most_common_label, is_categoric_attribute)
+                self.categorical_children[value] = DecisionTree(max_depth, depth + 1, categorical_partitions[value], gain_metric, most_common_label, is_categoric_attribute, random_subset, random_subset_size)
 
             def categorical_decision(sample):
                 if sample.attributes[best_attribute] in self.categorical_children.keys():
@@ -55,9 +64,9 @@ class DecisionTree:
             # partition examples numerically:
             less_than_examples, greater_than_examples, threshold = partition_examples_numerically(examples, best_attribute)
 
-            self.less_child = DecisionTree(max_depth, depth + 1, less_than_examples, gain_metric, self.most_common_label, is_categoric_attribute)
+            self.less_child = DecisionTree(max_depth, depth + 1, less_than_examples, gain_metric, self.most_common_label, is_categoric_attribute, random_subset, random_subset_size)
             self.greater_child = DecisionTree(max_depth, depth + 1, greater_than_examples, gain_metric,
-                                              self.most_common_label, is_categoric_attribute)
+                                              self.most_common_label, is_categoric_attribute, random_subset, random_subset_size)
 
             def numeric_decision(sample):
                 if isinstance(sample.attributes[best_attribute], float):
@@ -79,6 +88,19 @@ class DecisionTree:
         best_so_far = -1.0
         best_gain_val_so_far = float("-inf")
         for attribute_idx in range(len(examples[0].attributes)):
+            gain = info_gain(examples, attribute_idx, is_numeric_attributes, gain_metric)
+            if gain > best_gain_val_so_far:
+                best_so_far = attribute_idx
+                best_gain_val_so_far = gain
+        return best_so_far
+
+    @classmethod
+    def find_best_attribute_random_subset(cls, gain_metric, examples, is_numeric_attributes, subset_size):
+        best_so_far = -1.0
+        best_gain_val_so_far = float("-inf")
+        num_attributes = len(examples[0].attributes)
+        attribute_subset = sample(range(0,num_attributes), subset_size) if num_attributes >= subset_size else range(0,num_attributes)
+        for attribute_idx in attribute_subset:
             gain = info_gain(examples, attribute_idx, is_numeric_attributes, gain_metric)
             if gain > best_gain_val_so_far:
                 best_so_far = attribute_idx
@@ -296,10 +318,10 @@ def average_error(tree, test_examples):
 
 
 if __name__ == '__main__':
-    car_train_file = "Data/car/train.csv"
-    car_test_file = "Data/car/test.csv"
-    bank_train_file = "Data/bank/train.csv"
-    bank_test_file = "Data/bank/test.csv"
+    car_train_file = MY_DIR + "/Data/car/train.csv"
+    car_test_file =  MY_DIR + "/Data/car/test.csv"
+    bank_train_file =  MY_DIR + "/Data/bank/train.csv"
+    bank_test_file =  MY_DIR + "/Data/bank/test.csv"
 
 
 
