@@ -4,6 +4,7 @@ MY_DIR = dirname(realpath(__file__))
 path.append(MY_DIR)
 PARENT_DIR = dirname(path[0])
 path.append(PARENT_DIR)
+
 import numpy
 
 from random import shuffle

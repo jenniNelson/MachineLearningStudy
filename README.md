@@ -4,11 +4,15 @@ This is a machine learning library developed by Jennifer Nelson for CS5350/6350 
 
 
 ### Running
-The run.sh file will start several testing processes which can take several hours to complete. It will print out where the data can be found.
+The run.sh file in each folder runs the tests for the corresponding homework.
 
-I don't suggest running it unless you have to.
+**Homework 3:** Run the run.sh file in the Perceptron directory.
 
 
+
+
+
+-------------------
 
 ### Decision Trees
 Decision trees are encapsulated in the DecisionTree class. Instantiating a DecisionTree object requires training data and several parameters (including the metric used to calculate gain.)
@@ -27,11 +31,11 @@ Decision trees are encapsulated in the DecisionTree class. Instantiating a Decis
 
 ### Adaboost
  `adaBoost_vote_weights_and_stumps(examples, num_stumps, categorics)`
- 
+
  This method will create two lists of the same size, one of decision tree stumps (or longer, if a stump is worse than chance) and one of each decision stump's corrseponding vote weight.
- 
+
  (Note that `categorics` is a list of which attributes are numeric and which categoric (see above).)
- 
+
  In order to run, pass these two lists and the desired number of trees to use in a decision into the following method:
  `adaDecide(sample, vote_weights, stumps, num_to_consider)`
 
@@ -51,7 +55,7 @@ To make a prediction with either of these, pass the tree list into
 ### LMS: Batch and Stochastic Gradient Regression
 
    > Note that examples here is created using a different function than that of DecisionTrees and ensemble methods. This is to ensure all examples are numeric and augmented with an additional 1, for the b in a weight vector.
-   
+
    > This method is `examples_from_file_with_b(filename)`
 
 `lms_gradient_descent(examples, learning_rate, threshold, max_iterations)` and
@@ -61,7 +65,7 @@ To make a prediction with either of these, pass the tree list into
  both return `(weights, iteration, error)`, where `weights` is the learned weight vector, `iteration` is how many iterations the training took, and `error` is the final least-mean-square error of the weight vector. (As computed by `lms_error(examples, weights)`)
 
  To predict with the returned weight vector, call `predict(sample, weights)`.
- 
+
  Several other functions for computing average error, gradient, and similar also exist.
 
  
